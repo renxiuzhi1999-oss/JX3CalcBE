@@ -73,3 +73,74 @@ simulator:
 - Swap the UI for a framework of your choice by pointing the ``/ui`` mount to
   another build output.
 
+## Running from Visual Studio 2022
+
+If you prefer to launch the Python demo directly inside Visual Studio, follow
+these steps to avoid the common "无法配置项目" / "CMake 可执行文件错误" dialogs
+that appear when Visual Studio tries to configure the root ``CMakeLists.txt``.
+
+1. **Install the required workloads**
+
+   - From *Visual Studio Installer*, enable the **Python 开发** workload so the
+     IDE recognises Python projects.
+   - Enable **使用 C++ 的桌面开发** (or install standalone
+     [CMake](https://cmake.org/download/)) so Visual Studio ships with a CMake
+     binary.  Without this component the IDE will show the "CMake 可执行文件错误"
+     message whenever it scans the repository.
+
+2. **Open the repository**
+
+   Use *File ▸ Open ▸ Folder…* and pick the repository root.  When the CMake
+   notification pops up you can either click *Install CMake* (recommended) or
+   temporarily disable automatic configuration via *Tools ▸ Options ▸ CMake ▸
+   General ▸ Enable project configuration on opening a folder* → set to
+   **False**.  Disabling auto-configuration keeps Visual Studio from blocking
+   you with the error dialog while you work with the Python files.
+
+3. **Configure the Python environment**
+
+   - Open *View ▸ Other Windows ▸ Python Environments* and create/attach a
+     virtual environment.
+   - With the environment selected, install the demo dependencies by running
+
+     ```powershell
+     pip install fastapi uvicorn[standard]
+     ```
+
+4. **Set the startup script**
+
+   In *Solution Explorer* locate ``example/simulator/main.py``, right-click it
+   and choose **Set as Startup File**.  This tells the debugger to run the demo
+   backend instead of attempting a CMake build.
+
+5. **Pass the desired host/port arguments**
+
+   Open the project properties (**Debug ▸ Debug and Launch Settings**) and add
+   the following script arguments so the server listens on your preferred local
+   port:
+
+   ```text
+   --host 0.0.0.0 --port 18080
+   ```
+
+6. **Start debugging**
+
+   Press **F5** (or click *Start Debugging*).  Visual Studio will launch
+   ``uvicorn`` and show the server logs in the *Output* window.  Once the app is
+   running you can open <http://localhost:18080/ui/index.html> in a browser to
+   interact with the UI.  If you bound the server to another port, update the
+   *Server Endpoint* field in the UI accordingly.
+
+### Troubleshooting
+
+- **Still seeing the CMake error** – Verify that CMake is installed.  You can
+  add it via *Tools ▸ Get Tools and Features… ▸ 使用 C++ 的桌面开发*.  After the
+  installation, restart Visual Studio so it detects the new toolchain.
+- **Python debugger starts the wrong target** – Double-check that
+  ``example/simulator/main.py`` is marked as the startup file and that the
+  *Script Arguments* contain the `--host/--port` options.
+- **`ModuleNotFoundError` for FastAPI/Uvicorn** – Ensure the selected Python
+  environment has ``fastapi`` and ``uvicorn[standard]`` installed.  Installing
+  them in another environment (for example, the global interpreter) will not
+  automatically make them available to Visual Studio’s active environment.
+

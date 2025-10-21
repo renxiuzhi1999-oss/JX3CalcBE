@@ -75,6 +75,11 @@
 cmake --version
 ```
 
+> 如果你只想在 Visual Studio 中运行 ``example/simulator`` 下的 Python 示例,
+> 也需要安装上述 CMake 组件, 否则 Visual Studio 会在打开仓库时提示
+> "CMake 可执行文件错误"。详细步骤见
+> [`example/simulator/README.md`](example/simulator/README.md#running-from-visual-studio-2022).
+
 #### MacOS
 
 ##### Step 1: 安装 Homebrew
