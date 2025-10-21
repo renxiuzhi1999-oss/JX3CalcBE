@@ -1,0 +1,23 @@
+[
+  {
+    "id": 3001,
+    "name": "Battle Focus",
+    "icon": "battle_focus.png",
+    "duration": 15,
+    "tick_interval": null,
+    "effects": {
+      "attack_percent": 0.12,
+      "crit_chance": 0.08
+    }
+  },
+  {
+    "id": 3002,
+    "name": "Flame Sigil",
+    "icon": "flame_sigil.png",
+    "duration": 12,
+    "tick_interval": 3,
+    "effects": {
+      "periodic_damage": 42
+    }
+  }
+]

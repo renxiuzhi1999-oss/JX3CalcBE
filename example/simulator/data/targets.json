@@ -1,0 +1,10 @@
+[
+  {
+    "id": 1,
+    "name": "Raid Training Dummy",
+    "level": 120,
+    "defense": 3200,
+    "resistance": 0.12,
+    "max_health": 1000000
+  }
+]

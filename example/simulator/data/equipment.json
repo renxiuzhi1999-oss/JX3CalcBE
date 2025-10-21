@@ -1,0 +1,25 @@
+[
+  {
+    "id": 4001,
+    "name": "Jade Edge Saber",
+    "slot": "weapon",
+    "rarity": "epic",
+    "stats": {
+      "attack": 220,
+      "crit": 0.05,
+      "haste": 0.04
+    },
+    "attached_skill": null
+  },
+  {
+    "id": 4002,
+    "name": "Phoenix Feather Charm",
+    "slot": "trinket",
+    "rarity": "rare",
+    "stats": {
+      "attack": 80,
+      "crit": 0.1
+    },
+    "attached_skill": 1002
+  }
+]
