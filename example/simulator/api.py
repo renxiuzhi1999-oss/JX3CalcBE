@@ -8,6 +8,7 @@ from typing import List, Optional
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from . import data, simulation, tasks
@@ -140,6 +141,14 @@ def create_app(data_dir: Path) -> FastAPI:
     repository = data.create_repository(data_dir)
     manager = tasks.TaskManager(repository)
     app = FastAPI(title="JX3 Combat Simulator Demo", version="1.0.0")
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     ui_dir = (Path(__file__).resolve().parent / "ui")
     app.mount("/ui", StaticFiles(directory=str(ui_dir)), name="ui")

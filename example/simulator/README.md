@@ -23,21 +23,26 @@ loaded, how循环 simulation works, and how a前端 UI consumes the REST API.
    pip install fastapi uvicorn[standard]
    ```
 
-2. **Run the API**
+2. **Run the API (choose your local port)**
 
    ```bash
-   python -m example.simulator.main --host 0.0.0.0 --port 8000
+   python -m example.simulator.main --host 0.0.0.0 --port 18080
    ```
 
    The command uses ``uvicorn`` to start the FastAPI application defined in
-   ``api.py``.  By default the simulator loads the JSON files from the ``data``
-   directory shipped in this example.
+   ``api.py`` on your chosen port (``18080`` in this example).  You can point the
+   UI at any local port that you prefer for running the backend.  By default the
+   simulator loads the JSON files from the ``data`` directory shipped in this
+   example.
 
 3. **Open the UI**
 
-   Navigate to <http://localhost:8000/ui/index.html>.  The single-page UI will
+   Navigate to <http://localhost:18080/ui/index.html>.  The single-page UI will
    load metadata from the API, let you pick buffs/talents/equipment, and submit a
-   simulation.  Results are displayed in real time once the task finishes.
+   simulation.  If you serve the UI from a different origin, use the new *Server
+   Endpoint* field at the top of the page to enter the API base URL (for example,
+   ``http://localhost:18080``).  Results are displayed in real time once the task
+   finishes.
 
 ## API Overview
 

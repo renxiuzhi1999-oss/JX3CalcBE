@@ -82,6 +82,21 @@
     <main>
       <section>
         <h2>Build Configuration</h2>
+        <label for="endpoint">Server Endpoint</label>
+        <div style="display: grid; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <input
+            type="text"
+            id="endpoint"
+            placeholder="http://localhost:8000"
+            title="Base URL of the local simulator API"
+          />
+          <button id="apply-endpoint" type="button">Apply Endpoint</button>
+          <small>
+            The UI will call the simulator API at the configured base URL. Use
+            this to point the page at a different local port when the backend
+            runs on another process (for example, <code>http://localhost:18080</code>).
+          </small>
+        </div>
         <label for="rotation">Rotation Preset</label>
         <select id="rotation"></select>
 
@@ -111,7 +126,26 @@
     </main>
 
     <script>
-      const apiBase = window.location.origin;
+      let apiBase = window.location.origin;
+
+      function loadEndpoint() {
+        const stored = window.localStorage.getItem("simulatorEndpoint");
+        if (stored) {
+          apiBase = stored;
+        }
+        document.getElementById("endpoint").value = apiBase;
+      }
+
+      function saveEndpoint() {
+        const value = document.getElementById("endpoint").value.trim();
+        if (!value) {
+          return;
+        }
+        apiBase = value.replace(/\/$/, "");
+        window.localStorage.setItem("simulatorEndpoint", apiBase);
+        document.getElementById("status").textContent = `Endpoint set to ${apiBase}`;
+        init();
+      }
 
       async function fetchMetadata(endpoint) {
         const response = await fetch(`${apiBase}/${endpoint}`);
@@ -269,6 +303,8 @@
       }
 
       document.getElementById("run").addEventListener("click", runSimulation);
+      document.getElementById("apply-endpoint").addEventListener("click", saveEndpoint);
+      loadEndpoint();
       init();
     </script>
   </body>
