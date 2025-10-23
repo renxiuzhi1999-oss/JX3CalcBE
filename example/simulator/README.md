@@ -12,6 +12,7 @@ loaded, how循环 simulation works, and how a前端 UI consumes the REST API.
   aggregated DPS statistics.
 - FastAPI service that serves both the JSON API and a lightweight UI for manual testing.
 - Standalone命令行计算器，可在本地终端直接运行 DPS 模拟，无需网页前端。
+- Tkinter 图形界面程序，直接在桌面应用里配置循环并查看模拟结果。
 
 ## Getting Started
 
@@ -84,6 +85,35 @@ loaded, how循环 simulation works, and how a前端 UI consumes the REST API.
    运行结束后会显示平均 DPS、标准差以及每轮 DPS。可以结合 ``--seed`` 固定
    随机数，或调整 ``--fight-seconds``、``--iterations`` 进行更长时间或更多次
    的 Monte Carlo 迭代。
+
+## 启动桌面版图形界面
+
+当你希望以“原生应用”的方式体验模拟器时，可以运行新增的 Tkinter GUI。
+它与命令行/REST 接口共享同一套 JSON 数据与核心模拟代码，因此无需额
+外的后端服务。
+
+1. **准备依赖**
+
+   Tkinter 属于 Python 标准库的一部分，但部分 Linux 发行版需要额外
+   安装 ``python3-tk`` 软件包。Windows 与 macOS 通常默认自带。
+
+2. **启动应用**
+
+   ```bash
+   python -m example.simulator.gui
+   ```
+
+   程序会弹出一个窗口，顶部可以选择数据目录（默认使用 ``data``
+   文件夹）。左侧提供轮换、目标、Buff、奇穴、装备等选择器，右下角
+   的 *Run simulation* 按钮会执行多次迭代并在“Results”区域展示平均
+   DPS、标准差以及首轮的详细战斗记录。
+
+3. **自定义循环与数据目录**
+
+   - 在 *Custom rotation (IDs)* 输入框中填入以空格或逗号分隔的技能
+     ID，即可覆盖预设轮换。
+   - 如果你有自制的 JSON 数据表，点击 *Browse → Reload* 选择目录后
+     即可加载新的资源。
 
 ## API Overview
 
