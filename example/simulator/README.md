@@ -142,6 +142,9 @@ Tkinter 应用以及 `data/` 目录打包到可分发的文件夹中。
    - `--add-data example\simulator\data;example/simulator/data` 将 JSON
      资源打包进同级目录，运行时无需额外拷贝；
    - `--name jx3calc_windows` 生成 `dist\jx3calc_windows\` 输出目录。
+   - 打包完成后，脚本会自动把当前解释器目录中的 `pythonXY.dll` 与
+     `vcruntime*.dll` 复制到输出目录，避免在其他电脑上运行时出现
+     “Failed to load Python DLL” 的报错。
 
 3. **找到生成的程序**
 
@@ -151,8 +154,17 @@ Tkinter 应用以及 `data/` 目录打包到可分发的文件夹中。
    dist\jx3calc_windows\jx3calc_windows.exe
    ```
 
-   将整个 `dist\jx3calc_windows` 文件夹复制到任意电脑即可直接运行。
-   如果需要与其他文件共存，可以把该目录重命名或压缩成 zip。
+   将整个 `dist\jx3calc_windows` 文件夹复制到任意电脑即可直接运行
+   （务必保留 `_internal` 目录与刚复制过去的 DLL 文件）。如果需要
+   与其他文件共存，可以把该目录重命名或压缩成 zip。
+
+4. **常见问题**
+
+   - 如果运行时仍然弹出 “Failed to load Python DLL” 对话框，请确认
+     输出目录旁边的 `python*.dll` 与 `vcruntime*.dll` 没有被遗漏，或
+     在目标机器上安装 [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist)。
+   - 若将程序放在包含中文或特殊字符的路径下仍有问题，可先尝试
+     移动到纯英文路径，以排除路径编码导致的加载异常。
 
 > 注意：首次运行时 Windows 可能会弹出“来自未知发布者”的安全提示，
 > 这是因为生成的 exe 没有进行代码签名。点击“仍要运行”即可。
