@@ -115,6 +115,48 @@ loaded, how循环 simulation works, and how a前端 UI consumes the REST API.
    - 如果你有自制的 JSON 数据表，点击 *Browse → Reload* 选择目录后
      即可加载新的资源。
 
+## 打包为 Windows 可执行程序
+
+如果你希望把桌面版 GUI 打包成 `jx3calc_windows.exe`，可以使用
+[PyInstaller](https://pyinstaller.org/)。仓库新增了一个辅助脚本，自动把
+Tkinter 应用以及 `data/` 目录打包到可分发的文件夹中。
+
+1. **安装依赖**
+
+   ```powershell
+   cd example\simulator
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install pyinstaller
+   ```
+
+2. **运行打包脚本**
+
+   ```powershell
+   ..\..\scripts\package_demo_gui_windows.bat
+   ```
+
+   该脚本会在仓库根目录调用 PyInstaller：
+
+   - `--noconsole` 关闭控制台窗口，只保留 Tkinter 界面；
+   - `--add-data example\simulator\data;example/simulator/data` 将 JSON
+     资源打包进同级目录，运行时无需额外拷贝；
+   - `--name jx3calc_windows` 生成 `dist\jx3calc_windows\` 输出目录。
+
+3. **找到生成的程序**
+
+   打包完成后，PyInstaller 会提示可执行文件所在位置：
+
+   ```text
+   dist\jx3calc_windows\jx3calc_windows.exe
+   ```
+
+   将整个 `dist\jx3calc_windows` 文件夹复制到任意电脑即可直接运行。
+   如果需要与其他文件共存，可以把该目录重命名或压缩成 zip。
+
+> 注意：首次运行时 Windows 可能会弹出“来自未知发布者”的安全提示，
+> 这是因为生成的 exe 没有进行代码签名。点击“仍要运行”即可。
+
 ## API Overview
 
 - ``GET /metadata/*`` – Enumerates skills, buffs, equipment, talents, rotations
