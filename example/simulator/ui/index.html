@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>JX3 Combat Simulator Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background: linear-gradient(135deg, #1d4ed8, #9333ea);
+        padding: 2rem;
+        text-align: center;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 2rem;
+      }
+      main {
+        padding: 2rem;
+        display: grid;
+        gap: 1.5rem;
+      }
+      section {
+        background: #1e293b;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
+      }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+      select,
+      input,
+      button {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: inherit;
+        margin-bottom: 1rem;
+      }
+      button {
+        background: #2563eb;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button:hover {
+        background: #1d4ed8;
+      }
+      .results {
+        display: grid;
+        gap: 1rem;
+      }
+      .result-card {
+        background: #0f172a;
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid #334155;
+      }
+      pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        background: #0f172a;
+        padding: 1rem;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>JX3 Combat Simulator Demo</h1>
+      <p>Experiment with skills, buffs, equipment, and rotations.</p>
+    </header>
+    <main>
+      <section>
+        <h2>Build Configuration</h2>
+        <label for="endpoint">Server Endpoint</label>
+        <div style="display: grid; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <input
+            type="text"
+            id="endpoint"
+            placeholder="http://localhost:8000"
+            title="Base URL of the local simulator API"
+          />
+          <button id="apply-endpoint" type="button">Apply Endpoint</button>
+          <small>
+            The UI will call the simulator API at the configured base URL. Use
+            this to point the page at a different local port when the backend
+            runs on another process (for example, <code>http://localhost:18080</code>).
+          </small>
+        </div>
+        <label for="rotation">Rotation Preset</label>
+        <select id="rotation"></select>
+
+        <label for="buffs">Active Buffs</label>
+        <select id="buffs" multiple></select>
+
+        <label for="talents">Talents</label>
+        <select id="talents" multiple></select>
+
+        <label for="equipment">Equipment</label>
+        <select id="equipment" multiple></select>
+
+        <label for="duration">Fight Duration (seconds)</label>
+        <input type="number" id="duration" value="60" min="1" />
+
+        <label for="iterations">Iterations</label>
+        <input type="number" id="iterations" value="10" min="1" max="200" />
+
+        <button id="run">Run Simulation</button>
+        <div id="status"></div>
+      </section>
+
+      <section>
+        <h2>Results</h2>
+        <div class="results" id="results"></div>
+      </section>
+    </main>
+
+    <script>
+      let apiBase = window.location.origin;
+
+      function loadEndpoint() {
+        const stored = window.localStorage.getItem("simulatorEndpoint");
+        if (stored) {
+          apiBase = stored;
+        }
+        document.getElementById("endpoint").value = apiBase;
+      }
+
+      function saveEndpoint() {
+        const value = document.getElementById("endpoint").value.trim();
+        if (!value) {
+          return;
+        }
+        apiBase = value.replace(/\/$/, "");
+        window.localStorage.setItem("simulatorEndpoint", apiBase);
+        document.getElementById("status").textContent = `Endpoint set to ${apiBase}`;
+        init();
+      }
+
+      async function fetchMetadata(endpoint) {
+        const response = await fetch(`${apiBase}/${endpoint}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${endpoint}`);
+        }
+        return response.json();
+      }
+
+      function populateSelect(select, items, mapper) {
+        select.innerHTML = "";
+        for (const item of items) {
+          const option = document.createElement("option");
+          mapper(option, item);
+          select.appendChild(option);
+        }
+      }
+
+      async function init() {
+        try {
+          const [rotations, buffs, talents, equipment] = await Promise.all([
+            fetchMetadata("metadata/rotations"),
+            fetchMetadata("metadata/buffs"),
+            fetchMetadata("metadata/talents"),
+            fetchMetadata("metadata/equipment"),
+          ]);
+
+          const rotationSelect = document.getElementById("rotation");
+          populateSelect(rotationSelect, rotations, (option, rotation) => {
+            option.value = rotation.id;
+            option.textContent = `${rotation.name} (${rotation.school})`;
+          });
+
+          const buffSelect = document.getElementById("buffs");
+          populateSelect(buffSelect, buffs, (option, buff) => {
+            option.value = buff.id;
+            option.textContent = `${buff.name} (+${Math.round((buff.effects.attack_percent || 0) * 100)}% dmg)`;
+          });
+
+          const talentSelect = document.getElementById("talents");
+          populateSelect(talentSelect, talents, (option, talent) => {
+            option.value = talent.id;
+            option.textContent = `${talent.name}`;
+          });
+
+          const equipmentSelect = document.getElementById("equipment");
+          populateSelect(equipmentSelect, equipment, (option, item) => {
+            option.value = item.id;
+            option.textContent = `${item.name} (${item.slot})`;
+          });
+        } catch (error) {
+          document.getElementById("status").textContent = error.message;
+        }
+      }
+
+      function selectedValues(select) {
+        return Array.from(select.selectedOptions).map((option) => parseInt(option.value, 10));
+      }
+
+      async function runSimulation() {
+        const rotationId = document.getElementById("rotation").value;
+        const buffs = selectedValues(document.getElementById("buffs"));
+        const talents = selectedValues(document.getElementById("talents"));
+        const equipment = selectedValues(document.getElementById("equipment"));
+        const fightSeconds = parseFloat(document.getElementById("duration").value);
+        const iterations = parseInt(document.getElementById("iterations").value, 10);
+
+        document.getElementById("status").textContent = "Submitting simulation...";
+        document.getElementById("results").innerHTML = "";
+
+        try {
+          const response = await fetch(`${apiBase}/simulate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              build: {
+                active_buffs: buffs,
+                talents: talents,
+                equipment: equipment,
+              },
+              target_id: 1,
+              fight_seconds: fightSeconds,
+              iterations: iterations,
+              rotation_id: rotationId,
+            }),
+          });
+
+          if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.detail || "Simulation failed");
+          }
+
+          const payload = await response.json();
+          document.getElementById("status").textContent = `Task ${payload.task_id} queued...`;
+          pollTask(payload.task_id);
+        } catch (error) {
+          document.getElementById("status").textContent = error.message;
+        }
+      }
+
+      async function pollTask(taskId) {
+        const statusNode = document.getElementById("status");
+        const interval = setInterval(async () => {
+          const response = await fetch(`${apiBase}/tasks/${taskId}`);
+          if (!response.ok) {
+            clearInterval(interval);
+            statusNode.textContent = "Task lookup failed.";
+            return;
+          }
+          const payload = await response.json();
+          statusNode.textContent = `Status: ${payload.status}`;
+
+          if (payload.status === "finished") {
+            clearInterval(interval);
+            renderResults(payload);
+          }
+          if (payload.status === "error") {
+            clearInterval(interval);
+            statusNode.textContent = payload.error || "Simulation error.";
+          }
+        }, 1000);
+      }
+
+      function renderResults(payload) {
+        const container = document.getElementById("results");
+        container.innerHTML = "";
+
+        const summaryCard = document.createElement("div");
+        summaryCard.classList.add("result-card");
+        summaryCard.innerHTML = `
+          <h3>Summary</h3>
+          <p><strong>Average DPS:</strong> ${payload.average_dps.toFixed(2)}</p>
+          <p><strong>Max DPS:</strong> ${payload.max_dps.toFixed(2)}</p>
+          <p><strong>Min DPS:</strong> ${payload.min_dps.toFixed(2)}</p>
+          <p><strong>Std Dev:</strong> ${payload.stdev_dps.toFixed(2)}</p>
+        `;
+        container.appendChild(summaryCard);
+
+        for (const [index, iteration] of payload.iterations.entries()) {
+          const card = document.createElement("div");
+          card.classList.add("result-card");
+          card.innerHTML = `
+            <h4>Iteration ${index + 1}</h4>
+            <p>Total Damage: ${iteration.total_damage.toFixed(2)}</p>
+            <p>DPS: ${iteration.dps.toFixed(2)}</p>
+            <details>
+              <summary>Combat Log</summary>
+              <pre>${iteration.log
+                .map((entry) => `${entry.timestamp.toFixed(2)}s - Skill ${entry.skill_id} -> ${entry.damage.toFixed(1)}${entry.is_crit ? " (CRIT)" : ""}`)
+                .join("\n")}</pre>
+            </details>
+          `;
+          container.appendChild(card);
+        }
+      }
+
+      document.getElementById("run").addEventListener("click", runSimulation);
+      document.getElementById("apply-endpoint").addEventListener("click", saveEndpoint);
+      loadEndpoint();
+      init();
+    </script>
+  </body>
+</html>

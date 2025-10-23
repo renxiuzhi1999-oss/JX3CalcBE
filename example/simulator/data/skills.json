@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1001,
+    "name": "Crescent Slash",
+    "icon": "crescent_slash.png",
+    "school": "BladeMaster",
+    "base_damage": 120,
+    "coefficient": 1.15,
+    "cooldown": 1.5,
+    "gcd": 1.5,
+    "resource_cost": 20,
+    "script": "scripts/blademaster/crescent_slash.lua",
+    "tags": ["melee", "bleed"]
+  },
+  {
+    "id": 1002,
+    "name": "Skyfall",
+    "icon": "skyfall.png",
+    "school": "BladeMaster",
+    "base_damage": 180,
+    "coefficient": 1.35,
+    "cooldown": 6.0,
+    "gcd": 1.5,
+    "resource_cost": 40,
+    "script": "scripts/blademaster/skyfall.lua",
+    "tags": ["melee", "burst"]
+  },
+  {
+    "id": 2001,
+    "name": "Spirit Arrow",
+    "icon": "spirit_arrow.png",
+    "school": "SpiritArcher",
+    "base_damage": 95,
+    "coefficient": 1.05,
+    "cooldown": 1.0,
+    "gcd": 1.0,
+    "resource_cost": 15,
+    "script": "scripts/archer/spirit_arrow.lua",
+    "tags": ["ranged"]
+  }
+]

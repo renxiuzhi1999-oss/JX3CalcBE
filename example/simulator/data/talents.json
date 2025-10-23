@@ -1,0 +1,18 @@
+[
+  {
+    "id": 5001,
+    "name": "Sharp Mind",
+    "description": "Increases all damage dealt by 6%.",
+    "effects": {
+      "damage_percent": 0.06
+    }
+  },
+  {
+    "id": 5002,
+    "name": "Quick Reflexes",
+    "description": "Reduces global cooldown by 0.1s.",
+    "effects": {
+      "gcd_reduction": 0.1
+    }
+  }
+]

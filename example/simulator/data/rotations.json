@@ -1,0 +1,14 @@
+[
+  {
+    "id": "bm_basic",
+    "name": "Blade Master Basic",
+    "school": "BladeMaster",
+    "sequence": [1001, 1001, 1002]
+  },
+  {
+    "id": "archer_basic",
+    "name": "Spirit Archer Volley",
+    "school": "SpiritArcher",
+    "sequence": [2001, 2001, 2001, 3002]
+  }
+]
