@@ -11,6 +11,7 @@ loaded, how循环 simulation works, and how a前端 UI consumes the REST API.
 - Async task manager that runs multiple iterations in the background and exposes
   aggregated DPS statistics.
 - FastAPI service that serves both the JSON API and a lightweight UI for manual testing.
+- Standalone命令行计算器，可在本地终端直接运行 DPS 模拟，无需网页前端。
 
 ## Getting Started
 
@@ -43,6 +44,46 @@ loaded, how循环 simulation works, and how a前端 UI consumes the REST API.
    Endpoint* field at the top of the page to enter the API base URL (for example,
    ``http://localhost:18080``).  Results are displayed in real time once the task
    finishes.
+
+## 在本地终端运行命令行计算器
+
+如果你不需要 Web 界面，可以直接运行 ``example.simulator.cli`` 中的命令行程序。
+它使用与 REST API 相同的资源与模拟器，支持列出资源、指定轮换、装备、奇穴
+等配置项，并在终端输出 DPS 统计结果。
+
+1. **安装依赖（仅需标准库 + JSON 数据）**
+
+   基础模拟器不依赖 FastAPI/Uvicorn，因此只要激活虚拟环境即可：
+
+   ```bash
+   cd example/simulator
+   python -m venv .venv
+   source .venv/bin/activate  # Windows: .venv\Scripts\activate
+   ```
+
+2. **查看可用资源**
+
+   ```bash
+   python -m example.simulator.cli --list all
+   ```
+
+   该命令会列出 ``data`` 目录中的技能、Buff、奇穴、装备、轮换与目标的编号，
+   方便后续在命令行参数中引用。
+
+3. **执行一次模拟**
+
+   ```bash
+   python -m example.simulator.cli --rotation-id basic --iterations 50 --buff 2001 --talent 3001
+   ```
+
+   - ``--rotation-id`` 或 ``--rotation-sequence``：指定循环。
+   - ``--buff`` / ``--talent`` / ``--equipment``：重复该参数可以叠加多个配置。
+   - ``--show-log``：打印首轮的详细战斗记录。
+   - ``--json``：以 JSON 格式输出统计结果，便于脚本读取。
+
+   运行结束后会显示平均 DPS、标准差以及每轮 DPS。可以结合 ``--seed`` 固定
+   随机数，或调整 ``--fight-seconds``、``--iterations`` 进行更长时间或更多次
+   的 Monte Carlo 迭代。
 
 ## API Overview
 
