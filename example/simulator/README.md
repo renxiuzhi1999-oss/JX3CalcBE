@@ -141,10 +141,11 @@ Tkinter 应用以及 `data/` 目录打包到可分发的文件夹中。
    - `--noconsole` 关闭控制台窗口，只保留 Tkinter 界面；
    - `--add-data example\simulator\data;example/simulator/data` 将 JSON
      资源打包进同级目录，运行时无需额外拷贝；
-   - `--name jx3calc_windows` 生成 `dist\jx3calc_windows\` 输出目录。
-   - 打包完成后，脚本会自动把当前解释器目录中的 `pythonXY.dll` 与
-     `vcruntime*.dll` 复制到输出目录，避免在其他电脑上运行时出现
-     “Failed to load Python DLL” 的报错。
+  - `--name jx3calc_windows` 生成 `dist\jx3calc_windows\` 输出目录。
+  - 打包完成后，脚本会自动把当前解释器目录中的 `pythonXY.dll` 与
+    `vcruntime*.dll` 同时复制到 `dist\jx3calc_windows\` 以及其
+    `_internal` 子目录，兼容 PyInstaller 6.6 之后的新目录结构，避免
+    在其他电脑上运行时出现 “Failed to load Python DLL” 的报错。
 
 3. **找到生成的程序**
 
@@ -160,9 +161,11 @@ Tkinter 应用以及 `data/` 目录打包到可分发的文件夹中。
 
 4. **常见问题**
 
-   - 如果运行时仍然弹出 “Failed to load Python DLL” 对话框，请确认
-     输出目录旁边的 `python*.dll` 与 `vcruntime*.dll` 没有被遗漏，或
-     在目标机器上安装 [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist)。
+  - 如果运行时仍然弹出 “Failed to load Python DLL” 对话框，请确认
+    `_internal` 目录中确实存在 `python*.dll` 和 `vcruntime*.dll`，并
+    保证它们与可执行文件位于同一层级目录。若缺失，请重新在原机
+    器上运行打包脚本，或在目标机器上安装
+    [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist)。
    - 若将程序放在包含中文或特殊字符的路径下仍有问题，可先尝试
      移动到纯英文路径，以排除路径编码导致的加载异常。
 

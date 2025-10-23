@@ -35,20 +35,27 @@ if errorlevel 1 (
 )
 
 echo.
+set "DIST_DIR=dist\jx3calc_windows"
+set "DIST_INTERNAL=%DIST_DIR%\_internal"
+
 echo Copying Python runtime files...
 
 for /f "usebackq delims=" %%i in (`python -c "import sys, pathlib; dll_name=f'python{sys.version_info.major}{sys.version_info.minor}.dll'; print(pathlib.Path(sys.base_prefix)/dll_name)"`) do set "PY_DLL=%%i"
 if not defined PY_DLL goto :noPythonDll
 
 if exist "%PY_DLL%" (
-    copy /y "%PY_DLL%" "dist\jx3calc_windows\" >nul
+    copy /y "%PY_DLL%" "%DIST_DIR%\" >nul
+    if not exist "%DIST_INTERNAL%" mkdir "%DIST_INTERNAL%" >nul
+    copy /y "%PY_DLL%" "%DIST_INTERNAL%\" >nul
 ) else (
     echo [WARN] Could not find %PY_DLL%. The packaged app may fail to start.
 )
 
 for /f "usebackq delims=" %%i in (`python -c "import sys, pathlib; base=pathlib.Path(sys.base_prefix); matches=sorted(base.glob('vcruntime*.dll')); print(matches[-1] if matches else '')"`) do set "VC_DLL=%%i"
 if defined VC_DLL if exist "%VC_DLL%" (
-    copy /y "%VC_DLL%" "dist\jx3calc_windows\" >nul
+    copy /y "%VC_DLL%" "%DIST_DIR%\" >nul
+    if not exist "%DIST_INTERNAL%" mkdir "%DIST_INTERNAL%" >nul
+    copy /y "%VC_DLL%" "%DIST_INTERNAL%\" >nul
 ) else (
     if defined VC_DLL (
         echo [WARN] Could not find Microsoft VC runtime DLL. Ensure VC redistributable is installed on target machines.
@@ -69,6 +76,10 @@ goto :eof
 
 :noPythonDll
 echo [ERROR] Unable to locate the interpreter's pythonXY.dll. Ensure you are using a CPython interpreter.
+if exist "%DIST_DIR%" (
+    echo [INFO] Cleaning incomplete build directory...
+    rmdir /s /q "%DIST_DIR%" >nul 2>nul
+)
 popd
 endlocal
 exit /b 1
